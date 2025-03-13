@@ -32,11 +32,13 @@ async def read_root(request: Request):
         else:
             tabs_count += 1
 
+    sorted_votes = sorted(vote_data, key=lambda vote: vote['time_cast'], reverse=True)
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "tabs_count": tabs_count,
         "spaces_count": spaces_count,
-        "recent_votes": vote_data
+        "recent_votes": sorted_votes
     })
 
 
