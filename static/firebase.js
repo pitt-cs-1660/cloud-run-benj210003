@@ -130,6 +130,8 @@ async function vote(team) {
 
       if(reponse.ok){
         console.log("Success");
+        window.alert(`Vote for ${team} was successful`);
+        window.location.reload();
       }
     } catch (err) {
       console.log(`Error when submitting vote: ${err}`);

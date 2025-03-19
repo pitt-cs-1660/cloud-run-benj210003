@@ -53,20 +53,14 @@
     </ul>
   </div>
   <script>
-    async function voteAndReload(selection) {
-      await vote(selection);
-      window.alert(`Vote for ${selection} was successful`);
-      window.location.reload();
-    }
-
     document.addEventListener("DOMContentLoaded", function() {
       <!-- add Event Listener "click" to the vote -->
-      document.getElementById("voteTabs").addEventListener("click", function () {
-        voteAndReload("TABS");
+      document.getElementById("voteTabs").addEventListener("click", async function () {
+        await vote("TABS");
       });
 
-      document.getElementById("voteSpaces").addEventListener("click", function() {
-        voteAndReload("SPACES");
+      document.getElementById("voteSpaces").addEventListener("click", async function() {
+        await vote("SPACES");
       });
 
       document.getElementById("signInButton").addEventListener("click", function() {
