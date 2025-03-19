@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from google.cloud import firestore
 from typing import Annotated
 import datetime
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -17,21 +18,27 @@ votes_collection = db.collection("votes")
 
 
 @app.get("/")
-async def read_root(request: Request):
-    # ====================================
-    # ++++ START CODE HERE ++++
-    # ====================================
+async def read_root(request: Request):    
+    votes = votes_collection.stream()
 
-    # stream all votes; count tabs / spaces votes, and get recent votes
+    tabs_count = 0
+    spaces_count = 0
+    vote_data = []
+    for v in votes:
+        vote = v.to_dict()
+        vote_data.append(vote)
+        if vote.get('team') == 'SPACES':
+            spaces_count += 1
+        else:
+            tabs_count += 1
 
-    # ====================================
-    # ++++ STOP CODE ++++
-    # ====================================
+    sorted_votes = sorted(vote_data, key=lambda vote: vote['time_cast'], reverse=True)
+
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "tabs_count": 0,
-        "spaces_count": 0,
-        "recent_votes": []
+        "tabs_count": tabs_count,
+        "spaces_count": spaces_count,
+        "recent_votes": sorted_votes
     })
 
 
@@ -40,13 +47,9 @@ async def create_vote(team: Annotated[str, Form()]):
     if team not in ["TABS", "SPACES"]:
         raise HTTPException(status_code=400, detail="Invalid vote")
 
-    # ====================================
-    # ++++ START CODE HERE ++++
-    # ====================================
+    votes_collection.add({
+        "team": team,
+        "time_cast": datetime.datetime.utcnow().isoformat()
+    })
 
-    # create a new vote document in firestore
-    return {"detail": "Not implemented yet!"}
-
-    # ====================================
-    # ++++ STOP CODE ++++
-    # ====================================
+    return JSONResponse(status_code=200, content={"message": "Vote successfully recorded"})
